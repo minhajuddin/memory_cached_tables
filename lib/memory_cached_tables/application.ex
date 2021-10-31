@@ -15,7 +15,8 @@ defmodule MCT.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: MCT.PubSub},
       # Start the Endpoint (http/https)
-      MCTWeb.Endpoint
+      MCTWeb.Endpoint,
+      MCT.CachedSettings
       # Start a worker by calling: MCT.Worker.start_link(arg)
       # {MCT.Worker, arg}
     ]

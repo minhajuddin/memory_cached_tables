@@ -1,4 +1,4 @@
-defmodule MCT.Settings do
+defmodule MCT.Setting do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -10,8 +10,8 @@ defmodule MCT.Settings do
   end
 
   @doc false
-  def changeset(settings, attrs) do
-    settings
+  def changeset(setting, attrs) do
+    setting
     |> cast(attrs, [:key, :value])
     |> validate_required([:key, :value])
   end
