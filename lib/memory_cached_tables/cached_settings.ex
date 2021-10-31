@@ -13,7 +13,7 @@ defmodule MCT.CachedSettings do
   ## public api
 
   def get(key) do
-    Repo.get_by(Setting, key: key)
+    GenServer.call(__MODULE__, {:get, key})
   end
 
   def all() do
@@ -29,9 +29,9 @@ defmodule MCT.CachedSettings do
   end
 
   @impl true
-  def init(settings_map) do
+  def init(settings_table) do
     schedule_poll()
-    {:ok, settings_map, {:continue, :init}}
+    {:ok, settings_table, {:continue, :init}}
   end
 
   @impl true
@@ -72,8 +72,12 @@ defmodule MCT.CachedSettings do
   end
 
   @impl true
-  def handle_call(:all, _from, settings_map) do
-    {:reply, Map.values(settings_map), settings_map}
+  def handle_call(:all, _from, settings_table) do
+    {:reply, Map.values(settings_table.settings_map), settings_table}
+  end
+
+  def handle_call({:get, key}, _from, settings_table) do
+    {:reply, settings_table.settings_map[key], settings_table}
   end
 
   defp schedule_poll() do
