@@ -12,8 +12,11 @@ defmodule MCT.CachedSettings do
 
   ## public api
 
-  def get(key) do
-    GenServer.call(__MODULE__, {:get, key})
+  # find the setting you want using a matcher
+  # iex> MCT.CachedSettings.find(& &1.key == "hostx")
+  # iex> MCT.CachedSettings.find(fn setting -> setting.id == 3 end)
+  def find(finder_fun) do
+    GenServer.call(__MODULE__, {:find, finder_fun})
   end
 
   def all() do
@@ -21,7 +24,7 @@ defmodule MCT.CachedSettings do
   end
 
   ## genserver api
-  @polling_interval 1000
+  @polling_interval 60 * 1000
 
   @doc false
   def start_link(_opts) do
@@ -44,7 +47,8 @@ defmodule MCT.CachedSettings do
   end
 
   def handle_continue({:fetch_data, content_hash}, settings_table) do
-    Logger.debug(message: "FETCHING_NEW_DATA",
+    Logger.debug(
+      message: "FETCHING_NEW_DATA",
       new_content_hash: content_hash,
       old_content_hash: settings_table.content_hash
     )
@@ -76,8 +80,8 @@ defmodule MCT.CachedSettings do
     {:reply, Map.values(settings_table.settings_map), settings_table}
   end
 
-  def handle_call({:get, key}, _from, settings_table) do
-    {:reply, settings_table.settings_map[key], settings_table}
+  def handle_call({:find, finder_fun}, _from, settings_table) do
+    {:reply, settings_table.settings_map |> Map.values() |> Enum.find(finder_fun), settings_table}
   end
 
   defp schedule_poll() do
