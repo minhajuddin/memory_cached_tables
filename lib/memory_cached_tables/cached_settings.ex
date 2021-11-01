@@ -39,12 +39,12 @@ defmodule MCT.CachedSettings do
         {:fetch_data, content_hash},
         settings_table = %SettingsTable{content_hash: content_hash}
       ) do
-    Logger.info("SKIP_FETCH_DATA", content_hash: content_hash)
+    Logger.debug(message: "SKIP_FETCH_DATA", content_hash: content_hash)
     {:noreply, settings_table}
   end
 
   def handle_continue({:fetch_data, content_hash}, settings_table) do
-    Logger.info("FETCHING_NEW_DATA",
+    Logger.debug(message: "FETCHING_NEW_DATA",
       new_content_hash: content_hash,
       old_content_hash: settings_table.content_hash
     )
